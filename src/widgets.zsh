@@ -142,6 +142,29 @@ _zsh_autosuggest_accept() {
 	_zsh_autosuggest_invoke_original_widget $@
 }
 
+# Accept the first word of suggestion
+_zsh_autosuggest_word_accept() {
+	local -i max_cursor_pos=$#BUFFER
+
+	# When vicmd keymap is active, the cursor can't move all the way
+	# to the end of the buffer
+	if [[ "$KEYMAP" = "vicmd" ]]; then
+		max_cursor_pos=$((max_cursor_pos - 1))
+	fi
+
+	# Only accept if the cursor is at the end of the buffer
+	if [[ $CURSOR = $max_cursor_pos ]]; then
+		# Add the suggestion to the buffer
+        BUFFER="$BUFFER$(cut -d' ' -f1 <<<$POSTDISPLAY) "
+        POSTDISPLAY="$(cut -s -d' ' -f2- <<<$POSTDISPLAY)"
+
+		# Move the cursor to the end of the buffer
+		CURSOR=${#BUFFER}
+	fi
+
+	_zsh_autosuggest_invoke_original_widget $@
+}
+
 # Accept the entire suggestion and execute it
 _zsh_autosuggest_execute() {
 	# Add the suggestion to the buffer
@@ -192,7 +215,7 @@ _zsh_autosuggest_partial_accept() {
 
 () {
 	local action
-	for action in clear modify fetch suggest accept partial_accept execute enable disable toggle; do
+	for action in clear modify fetch suggest accept word_accept partial_accept execute enable disable toggle; do
 		eval "_zsh_autosuggest_widget_$action() {
 			local -i retval
 
@@ -212,6 +235,9 @@ _zsh_autosuggest_partial_accept() {
 	zle -N autosuggest-fetch _zsh_autosuggest_widget_fetch
 	zle -N autosuggest-suggest _zsh_autosuggest_widget_suggest
 	zle -N autosuggest-accept _zsh_autosuggest_widget_accept
+	zle -N autosuggest-word_accept _zsh_autosuggest_widget_word_accept
+	zle -N autosuggest-partial_accept _zsh_autosuggest_widget_partial_accept
+	zle -N autosuggest-partial_accept _zsh_autosuggest_widget_partial_accept
 	zle -N autosuggest-clear _zsh_autosuggest_widget_clear
 	zle -N autosuggest-execute _zsh_autosuggest_widget_execute
 	zle -N autosuggest-enable _zsh_autosuggest_widget_enable

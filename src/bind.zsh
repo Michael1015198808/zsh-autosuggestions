@@ -81,6 +81,8 @@ _zsh_autosuggest_bind_widgets() {
 			_zsh_autosuggest_bind_widget $widget clear
 		elif [[ -n ${ZSH_AUTOSUGGEST_ACCEPT_WIDGETS[(r)$widget]} ]]; then
 			_zsh_autosuggest_bind_widget $widget accept
+		elif [[ -n ${ZSH_AUTOSUGGEST_ACCEPT_WIDGETS[(r)$widget]} ]]; then
+			_zsh_autosuggest_bind_widget $widget word_accept
 		elif [[ -n ${ZSH_AUTOSUGGEST_EXECUTE_WIDGETS[(r)$widget]} ]]; then
 			_zsh_autosuggest_bind_widget $widget execute
 		elif [[ -n ${ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS[(r)$widget]} ]]; then
